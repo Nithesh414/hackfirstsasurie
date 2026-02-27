@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Small Card Login/Signup</title>
+<style>
+body{
+    height:100vh;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+      url("images/signin back.jpeg") 
+      no-repeat center center fixed;
+    background-size:cover;
+    font-family: 'Segoe UI', sans-serif;
+}
+.container{
+    width: calc(100% - 100px);  
+    max-width: 300px;
+    height: calc(100% - 100px); 
+    max-height: 450px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2), 
+                0 0 10px rgba(255,255,255,0.05) inset;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.signup, .signin{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:90%;
+    transform: translate(-50%, -50%);
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.signin{
+    display:none;
+}
+h2{
+    text-align:center;
+    margin-bottom:15px;
+    font-size:18px;
+    color:#333;
+}
+
+option{
+    background-color: lightgreen;
+}
+input, select{
+    width:100%;
+    padding:10px 12px;
+    margin-bottom:12px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.3);
+    font-size:14px;
+    outline:none;
+    box-sizing: border-box;
+    min-width:180px;
+    max-width:240px;
+    max-height:35px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+input::placeholder, select option{
+    color: rgba(255,255,255,0.7);
+}
+input:focus,
+select:focus{
+    border-color:#66ffcc;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+button{
+    width:100%;
+    padding:10px 0;
+    border:none;
+    border-radius:10px;
+    background: rgba(102, 255, 170, 0.3);
+    color:white;
+    font-size:14px;
+    cursor:pointer;
+    margin-top:8px;
+    backdrop-filter: blur(5px) saturate(150%);
+    -webkit-backdrop-filter: blur(5px) saturate(150%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+button:hover{
+    background: rgba(102, 255, 170, 0.5);
+}
+.switch{
+    text-align:center;
+    margin-top:10px;
+    font-size:12px;
+}
+.switch span{
+    color:lightgreen;
+    font-weight:bold;
+    cursor:pointer;
+}
+.switch span:hover{
+    color:green;
+}
+@media (max-width: 400px){
+    .container{
+        width: 80%;
+        height: auto;
+        min-height: 380px;
+        padding:15px;
+    }
+    input, select{
+        font-size:13px;
+        padding:8px 10px;
+    }
+    button{
+        font-size:13px;
+        padding:8px 0;
+    }
+    h2{
+        font-size:16px;
+    }
+    .switch{
+        font-size:11px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="signup" id="signupForm">
+        <h2>Sign Up</h2>
+        <input type="text" id="signupName" placeholder="Name">
+        <input type="email" id="signupEmail" placeholder="Email">
+        <input type="tel" id="signupPhone" placeholder="Phone Number">
+        <input type="password" id="signupPass" placeholder="Create Password">
+        <input type="password" id="signupConfirm" placeholder="Confirm Password">
+        <select id="signupUserType">
+            <option value="">Select User Type</option>
+            <option value="customer">Customer</option>
+            <option value="farmer">Farmer</option>
+        </select>
+        <button onclick="handleSignUp()">Register</button>
+        <div class="switch">
+            Have account? <span onclick="showSignIn()">Sign In</span>
+        </div>
+    </div>
+    <div class="signin" id="signinForm">
+        <h2>Sign In</h2>
+        <input type="email" id="signinEmail" placeholder="Email">
+        <input type="password" id="signinPass" placeholder="Password">
+        <select id="signinUserType">
+            <option value="">Select User Type</option>
+            <option value="customer">Customer</option>
+            <option value="farmer">Farmer</option>
+        </select>
+        <button id="but" onclick="handleSignIn()"><a id="atag">Login</a></button>
+        <div class="switch">
+            New user? <span onclick="showSignUp()">Sign Up</span>
+        </div>
+    </div>
+</div>
+<script>
+// Toggle between Sign In and Sign Up forms
+function showSignIn() {
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('signinForm').style.display = 'flex';
+}
+
+function showSignUp() {
+    document.getElementById('signinForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'flex';
+}
+
+// Handle user sign-up
+function handleSignUp() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    const pass = document.getElementById('signupPass').value.trim();
+    const confirm = document.getElementById('signupConfirm').value.trim();
+    const userType = document.getElementById('signupUserType').value;
+
+    if (!name || !email || !phone || !pass || !confirm || !userType) {
+        alert("Please fill all fields!");
+        return;
+    }
+    if (pass !== confirm) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    // Save user info in localStorage
+    localStorage.setItem('loggedInName', name);
+    localStorage.setItem('loggedInType', userType);
+
+    // Pre-fill sign-in form
+    document.getElementById('signinEmail').value = email;
+    document.getElementById('signinUserType').value = userType;
+
+    // Switch to sign-in form
+    showSignIn();
+
+    // Clear signup fields
+    document.getElementById('signupName').value = '';
+    document.getElementById('signupEmail').value = '';
+    document.getElementById('signupPhone').value = '';
+    document.getElementById('signupPass').value = '';
+    document.getElementById('signupConfirm').value = '';
+    document.getElementById('signupUserType').value = '';
+}
+
+// Handle user sign-in
+function handleSignIn() {
+    const email = document.getElementById('signinEmail').value.trim();
+    const pass = document.getElementById('signinPass').value.trim();
+    const userType = document.getElementById('signinUserType').value;
+
+    if (!email || !pass || !userType) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    // Store user info in localStorage
+    let name = localStorage.getItem('loggedInName') || email.split('@')[0];
+    localStorage.setItem('loggedInName', name);
+    localStorage.setItem('loggedInType', userType);
+
+    // Redirect based on user type
+    if (userType === 'customer') {
+        window.location.href = 'customer.html';
+    } else {
+        window.location.href = 'dashboard.html';
+    }
+}
+</script>
+</body>
+</html>

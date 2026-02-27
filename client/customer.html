@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Manager | TN Price Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #059669; border-radius: 10px; }
+
+        .active-city { 
+            background-color: #059669 !important; 
+            color: white !important; 
+            box-shadow: 0 10px 15px -3px rgba(5,150,105,0.3); 
+        }
+
+        aside { width: 25%; height: 100vh; }
+        main { flex: 1; height: 100vh; overflow-y: hidden; }
+        .yield-card { padding: 1.5rem; border-radius: 2rem; }
+
+        @media (max-width: 768px) {
+            aside { 
+                width: 100% !important; 
+                height: 280px !important; 
+                border-right: none; 
+                border-bottom: 1px solid #e2e8f0; 
+            }
+            main { 
+                width: 100% !important; 
+                height: auto !important; 
+                overflow: visible !important; 
+            }
+            .yield-card { padding: 1rem !important; border-radius: 1.25rem !important; }
+            .yield-price { font-size: 1.25rem !important; }
+            .yield-icon { font-size: 1.5rem !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex flex-col md:flex-row">
+
+    <!-- Sidebar -->
+    <aside class="bg-white border-r border-gray-200 flex flex-col shadow-2xl z-10">
+        <div class="p-6 border-b border-gray-100 bg-emerald-900 text-white flex items-center gap-3">
+            <div class="bg-emerald-500 p-2 rounded-lg">
+                <span class="text-white text-xl">🌾</span>
+            </div>
+            <h2 class="text-lg font-black tracking-tighter uppercase italic">Agro Manager</h2>
+        </div>
+        <div class="p-3 bg-gray-50 border-b">
+            <input type="text" id="citySearch" placeholder="Search District..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+        </div>
+        <nav id="district-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1"></nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 md:px-10 py-4 md:py-5">
+            <div class="flex flex-col">
+                <span id="current-date" class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest"></span>
+                <h2 id="selected-city" class="text-2xl font-black text-slate-800 tracking-tight">Market Dashboard</h2>
+            </div>
+            <div class="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
+                <p class="text-xs font-bold text-emerald-600">● LIVE UPDATES</p>
+            </div>
+        </header>
+
+        <div class="p-6 md:p-10 overflow-y-auto flex-1">
+            <!-- Welcome Message -->
+            <div id="welcome-msg" class="flex flex-col items-center justify-center h-full text-center">
+                <div class="bg-emerald-50 w-24 h-24 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-6">
+                    <span class="text-5xl md:text-4xl">🌾</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-700">Tamil Nadu Price Index</h3>
+                <p class="text-slate-400 mt-2 max-w-sm">Select a district from the sidebar to view localized yield rates and market trends.</p>
+            </div>
+
+            <!-- Rate Grid -->
+            <div id="rate-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        const tnDistricts = ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kancheepuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivagangai", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"];
+        const baseVeggies = [
+            { name: "Tomato", base: 30, icon: "🍅" },
+            { name: "Onion", base: 45, icon: "🧅" },
+            { name: "Potato", base: 25, icon: "🥔" },
+            { name: "Brinjal", base: 35, icon: "🍆" },
+            { name: "Carrot", base: 60, icon: "🥕" },
+            { name: "Drumstick", base: 85, icon: "🎋" },
+            { name: "Green Chilli", base: 55, icon: "🌶️" },
+            { name: "Cabbage", base: 20, icon: "🥬" }
+        ];
+
+        // Set current date
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        const listContainer = document.getElementById('district-list');
+
+        function renderDistricts(filter = "") {
+            listContainer.innerHTML = "";
+            tnDistricts.forEach(city => {
+                if (city.toLowerCase().includes(filter.toLowerCase())) {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl transition-all flex items-center group hover:bg-emerald-50";
+                    btn.innerHTML = `<span class="mr-3">📍</span><span class="font-semibold text-slate-600">${city}</span>`;
+                    btn.onclick = () => {
+                        showRates(city, btn);
+                        if(window.innerWidth < 768) document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+                    };
+                    listContainer.appendChild(btn);
+                }
+            });
+        }
+
+        function showRates(city, element) {
+            document.querySelectorAll('#district-list button').forEach(b => b.classList.remove('active-city'));
+            element.classList.add('active-city');
+
+            document.getElementById('selected-city').innerText = city + " Market";
+            document.getElementById('welcome-msg').classList.add('hidden');
+
+            const grid = document.getElementById('rate-grid');
+            grid.classList.remove('hidden');
+            grid.innerHTML = "";
+
+            baseVeggies.forEach(veg => {
+                const variation = (city.length % 5) * 2;
+                const finalPrice = veg.base + variation + (Math.floor(Math.random() * 5));
+                const trend = Math.random() > 0.5 ? 'up' : 'down';
+                grid.innerHTML += `
+                    <div class="yield-card bg-white shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <span class="yield-icon text-3xl">${veg.icon}</span>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full ${trend === 'up' ? 'text-red-500 bg-red-50' : 'text-emerald-600 bg-emerald-50'}">
+                                ${trend === 'up' ? '▲ High' : '▼ Low'}
+                            </span>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-slate-400 text-xs font-bold uppercase">${veg.name}</p>
+                            <p class="yield-price text-3xl font-black text-slate-800 mt-1">₹${finalPrice}<span class="text-sm text-slate-400 font-normal">/kg</span></p>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.getElementById('citySearch').oninput = e => renderDistricts(e.target.value);
+        renderDistricts();
+    </script>
+</body>
+</html>

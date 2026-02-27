@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif;}
+body {background:#F4F6F5; color:#333;}
+.navbar {height:70px; background:#1B5E20; color:white; display:flex; align-items:center; justify-content:space-between; padding:0 40px; flex-wrap:wrap;}
+.nav-links a {color:white; text-decoration:none; margin-left:20px; font-size:14px;}
+.top-row {display:flex; justify-content:space-between; align-items:center; padding:20px 40px; flex-wrap:wrap;}
+.quote {color:#2E7D32; font-style:italic; font-size:14px;}
+.admin-btn button {padding:8px 15px; background:#1B5E20; color:white; border:none; border-radius:8px; cursor:pointer; font-size:14px;}
+.pending-wrapper {background:#ffffff; padding:20px 40px; margin-bottom:25px; border-radius:14px; box-shadow:0 4px 12px rgba(0,0,0,0.06);}
+.pending-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap;}
+.pending-title h3 {font-size:16px;}
+.task-count {background:#f2f2f2; padding:4px 10px; border-radius:20px; font-size:12px;}
+.view-all {text-decoration:none; color:#2E7D32; font-weight:500; font-size:12px;}
+.pending-grid {display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.task-card {border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; min-height:100px; border:1px solid rgba(0,0,0,0.05);}
+.task-top h4 {font-size:14px;} .task-top p {font-size:12px;} .icon {font-size:18px;}
+.task-bottom {display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-top:12px;}
+.chip {background:#d9d9d9; padding:2px 8px; border-radius:20px; font-size:10px;}
+.red{background:#FDECEA;} .yellow{background:#FFF8E1;} .orange{background:#FFF3E0;} .green{background:#E8F5E9;} .progress{color:#2E7D32;font-weight:600;}
+.main-grid {display:grid; grid-template-columns:60% 40%; gap:20px; padding:0 40px; margin-bottom:30px;}
+.card {padding:20px; border-radius:18px; background:rgba(255,255,255,0.25); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.3); box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+.crop canvas {height:300px !important; max-height:250px;}
+.sub-grid {display:grid; grid-template-columns:330px auto; gap:20px; padding:0 40px; margin-bottom:30px;}
+.pie {display:flex; flex-direction:column; align-items:center; justify-content:center; width:330px; height:450px;}
+.pie canvas {width:330px !important; height:330px !important;}
+.suggested-crops {background:#E8F5E9; border:1px solid #C8E6C9; display:flex; flex-direction:column; justify-content:center; padding:20px; border-radius:18px;}
+.suggested-crops ul li {background:#C8E6C9; color:#1B5E20; padding:6px 10px; border-radius:12px; margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:6px;}
+.weather {background:linear-gradient(135deg,#C8E6C9,#81C784); color:#1B5E20;}
+.weather h1 {font-size:36px; margin:15px 0;}
+.footer {background:#1B5E20; color:white; text-align:center; padding:15px;}
+@media (max-width:1024px){.main-grid, .sub-grid {grid-template-columns:1fr; padding:15px;}}
+@media (max-width:768px){.pending-grid {grid-template-columns:1fr;} .crop canvas {height:220px !important;} .pie {width:100%; height:auto;} .pie canvas{width:100% !important; height:auto !important;}}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div><strong>🌾 AgroManage</strong></div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="farmerdashboard.html">Farmers</a>
+    <a href="">Crops</a>
+    <a href="management.html">Reports</a>
+  </div>
+  <div>🔔 👤</div>
+</div>
+
+<div class="top-row">
+  <div>
+    <h2 id="dashboardGreeting">Good Morning, Admin 🌱</h2>
+    <div class="quote">"Smart farming ensures better harvesting."</div>
+  </div>
+  <div class="admin-btn"><button>Admin Page</button></div>
+</div>
+
+<div class="pending-wrapper">
+  <div class="pending-header">
+    <div class="pending-title">
+      <h3>Today's Pending Works</h3>
+      <span class="task-count" id="taskCount">0 Tasks Pending</span>
+    </div>
+    <a href="#" class="view-all">View All →</a>
+  </div>
+  <div class="pending-grid"></div>
+</div>
+
+<div class="main-grid">
+  <div class="card crop">
+    <h3>Crop Production</h3>
+    <canvas id="lineChart"></canvas>
+  </div>
+  <div class="card weather">
+    <h3>Weather Forecast</h3>
+    <h1 id="temp">--°C</h1>
+    <p id="weatherDesc">Loading...</p>
+    <p id="humidity">Humidity: --%</p>
+    <p id="wind">Wind: -- km/h</p>
+  </div>
+</div>
+
+<div class="sub-grid">
+  <div class="card pie">
+    <h3>Crop Yield Distribution</h3>
+    <canvas id="donutChart"></canvas>
+  </div>
+  <div class="card suggested-crops">
+    <h3>Suggested Crops for This Season</h3>
+    <ul></ul>
+    <p>Recommended crops based on soil & weather conditions to maximize yield.</p>
+  </div>
+</div>
+
+<div class="footer">© 2026 AgroManage | Farmer Management System</div>
+
+<script>
+// ========== BUILT-IN DATASET ==========
+const USERS_DATA = {
+  "admin": {
+    "user": "Admin",
+    "pendingTasks": {
+      "totalPending": 3,
+      "tasks": [
+        {"title":"Fertilizer Stock Low","description":"Order urea and DAP fertilizers","icon":"⚠️","status":"Due Today","chip":"SIP","color":"red"},
+        {"title":"Field Irrigation - East Farm","description":"Scheduled at 10:00 AM","icon":"💧","status":"Assigned to Rajesh","chip":"SIP","color":"yellow"},
+        {"title":"Tractor Maintenance","description":"Oil change and check tires","icon":"🚜","status":"Due by 3:00 PM","chip":"SIP","color":"orange"}
+      ]
+    },
+    "cropProduction": {"labels":["Jan","Feb","Mar","Apr","May"], "data":[50,65,70,85,90]},
+    "cropYieldDistribution":{"labels":["Wheat","Rice","Corn","Soybean"],"data":[35,25,20,20],"colors":["#4CAF50","#FF9800","#2196F3","#9C27B0"]},
+    "suggestedCrops":[{"crop":"Wheat","icon":"🌾","season":"Feb to Apr"},{"crop":"Corn","icon":"🌽","season":"Mar to Jun"},{"crop":"Tomato","icon":"🍅","season":"Mar to May"},{"crop":"Rice","icon":"💧","season":"Jun to Sep"}]
+  },
+  "farmer": {
+    "user": "Farmer Raj",
+    "pendingTasks": {
+      "totalPending": 2,
+      "tasks":[
+        {"title":"Irrigation Check","description":"Check sprinklers in Plot A","icon":"💧","status":"Due Today","chip":"SIP","color":"yellow"},
+        {"title":"Seed Delivery","description":"Receive maize seeds from supplier","icon":"🌽","status":"Due by 2:00 PM","chip":"SIP","color":"green"}
+      ]
+    },
+    "cropProduction":{"labels":["Jan","Feb","Mar","Apr","May"],"data":[30,45,55,70,80]},
+    "cropYieldDistribution":{"labels":["Maize","Tomato","Rice","Wheat"],"data":[40,30,20,10],"colors":["#FFC107","#FF5722","#4CAF50","#9C27B0"]},
+    "suggestedCrops":[{"crop":"Maize","icon":"🌽","season":"Mar to Jun"},{"crop":"Tomato","icon":"🍅","season":"Mar to May"},{"crop":"Rice","icon":"💧","season":"Jun to Sep"},{"crop":"Wheat","icon":"🌾","season":"Feb to Apr"}]
+  },
+  "customer": {
+    "user": "Customer Priya",
+    "pendingTasks":{"totalPending":1,"tasks":[{"title":"Order Fertilizer","description":"Order nitrogen fertilizer for plot B","icon":"⚠️","status":"Due Today","chip":"SIP","color":"red"}]},
+    "cropProduction":{"labels":["Jan","Feb","Mar","Apr","May"],"data":[20,30,35,50,60]},
+    "cropYieldDistribution":{"labels":["Wheat","Rice","Corn","Tomato"],"data":[25,25,30,20],"colors":["#4CAF50","#FF9800","#2196F3","#FF5722"]},
+    "suggestedCrops":[{"crop":"Tomato","icon":"🍅","season":"Mar to May"},{"crop":"Wheat","icon":"🌾","season":"Feb to Apr"},{"crop":"Rice","icon":"💧","season":"Jun to Sep"}]
+  }
+};
+
+// ========== GET CURRENT USER ==========
+const currentUserType = localStorage.getItem('loggedInType') || 'admin';
+const currentUserData = USERS_DATA[currentUserType];
+
+// ========== RENDER DASHBOARD ==========
+function renderDashboard(data) {
+  document.getElementById('dashboardGreeting').textContent = `Good Morning, ${localStorage.getItem('loggedInName') || data.user} 🌱`;
+  
+  // Pending tasks
+  const taskGrid = document.querySelector('.pending-grid');
+  taskGrid.innerHTML = '';
+  data.pendingTasks.tasks.forEach(task=>{
+    const card = document.createElement('div');
+    card.className = `task-card ${task.color}`;
+    card.innerHTML = `<div class="task-top"><div class="icon">${task.icon}</div><div><h4>${task.title}</h4><p>${task.description}</p></div></div>
+                      <div class="task-bottom"><span>${task.status}</span><span class="chip">${task.chip}</span></div>`;
+    taskGrid.appendChild(card);
+  });
+  document.getElementById('taskCount').textContent = `${data.pendingTasks.totalPending} Tasks Pending`;
+
+  // Line chart
+  new Chart(document.getElementById("lineChart"),{
+    type:'line',
+    data:{labels:data.cropProduction.labels,datasets:[{label:'Yield',data:data.cropProduction.data,borderColor:'#1B5E20',fill:false}]}
+  });
+
+  // Donut chart
+  new Chart(document.getElementById("donutChart"),{
+    type:'doughnut',
+    data:{labels:data.cropYieldDistribution.labels,datasets:[{data:data.cropYieldDistribution.data,backgroundColor:data.cropYieldDistribution.colors,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{position:'bottom',labels:{padding:15,font:{size:12}}}}}
+  });
+
+  // Suggested crops
+  const suggestedList = document.querySelector('.suggested-crops ul');
+  suggestedList.innerHTML = '';
+  data.suggestedCrops.forEach(crop=>{
+    const li = document.createElement('li');
+    li.textContent = `${crop.icon} ${crop.crop} – ${crop.season}`;
+    suggestedList.appendChild(li);
+  });
+
+  // Weather
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const apiKey = 'c25e7f27140e7eb0f3a5ad91a3f77996';
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
+        .then(res=>res.json())
+        .then(weather=>{
+          document.getElementById('temp').textContent = `${Math.round(weather.main.temp)}°C`;
+          document.getElementById('weatherDesc').textContent = weather.weather[0].description;
+          document.getElementById('humidity').textContent = `Humidity: ${weather.main.humidity}%`;
+          document.getElementById('wind').textContent = `Wind: ${weather.wind.speed} km/h`;
+        }).catch(err=>console.error(err));
+    });
+  } else {document.getElementById('weatherDesc').textContent='Geolocation not supported';}
+}
+
+renderDashboard(currentUserData);
+</script>
+
+</body>
+</html>

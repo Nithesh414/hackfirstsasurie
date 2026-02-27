@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroManage | Farmers Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f4f8; }
+
+    .navbar {
+        height: 70px; background: #1B5E20; color: white;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: sticky; top:0; z-index:1000; font-family:'Poppins',sans-serif;
+    }
+    .nav-brand { font-size: 20px; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .nav-links { display:flex; gap:25px; }
+    .nav-links a { color: rgba(255,255,255,0.85); font-size:14px; transition:0.3s; padding:5px 0; border-bottom:2px solid transparent; }
+    .nav-links a:hover, .nav-links a.active { color:#fff; border-bottom:2px solid #81C784; }
+
+    .glass-card { background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border:1px solid rgba(255,255,255,0.3); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1B5E20; border-radius:10px; }
+
+    @media(max-width:850px) { .navbar { height:auto; padding:15px 20px; flex-direction:column; gap:15px; } }
+</style>
+</head>
+<body class="min-h-screen custom-scrollbar">
+
+<nav class="navbar">
+    <div class="nav-brand"><span>🌾</span> AgroManage</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="farmerdashboard.html" class="active">Farmers</a>
+        <a href="cnnala">Crops</a>
+        <a href="management.html">Reports</a>
+    </div>
+    <div class="nav-actions flex items-center gap-5">
+        <div class="cursor-pointer" title="Notifications">🔔</div>
+        <div class="cursor-pointer" title="Profile Settings">👤</div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Farmer Input Form -->
+    <div class="lg:col-span-4">
+        <div class="glass-card p-8 rounded-[2.5rem] shadow-2xl sticky top-28 border-b-8 border-green-800">
+            <h2 class="text-3xl font-black text-slate-800 mb-1">Stock Entry</h2>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Register your harvest details.</p>
+
+            <form id="farmerForm" class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Select District</label>
+                    <select id="districtName" required class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-green-600 font-bold text-slate-700 outline-none cursor-pointer">
+                        <option value="" disabled selected>Choose Location</option>
+                        <option value="Ariyalur">Ariyalur</option>
+                        <option value="Chengalpattu">Chengalpattu</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Coimbatore">Coimbatore</option>
+                        <option value="Cuddalore">Cuddalore</option>
+                        <option value="Dharmapuri">Dharmapuri</option>
+                        <option value="Dindigul">Dindigul</option>
+                        <option value="Erode">Erode</option>
+                        <option value="Kallakurichi">Kallakurichi</option>
+                        <option value="Kancheepuram">Kancheepuram</option>
+                        <option value="Kanyakumari">Kanyakumari</option>
+                        <option value="Karur">Karur</option>
+                        <option value="Krishnagiri">Krishnagiri</option>
+                        <option value="Madurai">Madurai</option>
+                        <option value="Mayiladuthurai">Mayiladuthurai</option>
+                        <option value="Nagapattinam">Nagapattinam</option>
+                        <option value="Namakkal">Namakkal</option>
+                        <option value="Nilgiris">Nilgiris</option>
+                        <option value="Perambalur">Perambalur</option>
+                        <option value="Pudukkottai">Pudukkottai</option>
+                        <option value="Ramanathapuram">Ramanathapuram</option>
+                        <option value="Ranipet">Ranipet</option>
+                        <option value="Salem">Salem</option>
+                        <option value="Sivagangai">Sivagangai</option>
+                        <option value="Tenkasi">Tenkasi</option>
+                        <option value="Thanjavur">Thanjavur</option>
+                        <option value="Theni">Theni</option>
+                        <option value="Thoothukudi">Thoothukudi</option>
+                        <option value="Tiruchirappalli">Tiruchirappalli</option>
+                        <option value="Tirunelveli">Tirunelveli</option>
+                        <option value="Tirupathur">Tirupathur</option>
+                        <option value="Tiruppur">Tiruppur</option>
+                        <option value="Tiruvallur">Tiruvallur</option>
+                        <option value="Tiruvannamalai">Tiruvannamalai</option>
+                        <option value="Tiruvarur">Tiruvarur</option>
+                        <option value="Vellore">Vellore</option>
+                        <option value="Viluppuram">Viluppuram</option>
+                        <option value="Virudhunagar">Virudhunagar</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Crop Variety</label>
+                    <select id="cropType" required class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-green-600 font-bold text-slate-700 outline-none">
+                        <option value="Tomato">🍅 Tomato (Thakkali)</option>
+                        <option value="Onion">🧅 Onion (Vengayam)</option>
+                        <option value="Potato">🥔 Potato (Urulai)</option>
+                        <option value="Brinjal">🍆 Brinjal (Kathirikai)</option>
+                        <option value="Drumstick">🎋 Drumstick (Murungai)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Yield (KG)</label>
+                        <input type="number" id="yieldQty" placeholder="0" required class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-green-600 font-bold text-slate-700 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Rate (₹)</label>
+                        <input type="number" id="pricePerKg" placeholder="₹/KG" required class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-green-600 font-bold text-slate-700 outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-5 bg-[#1B5E20] hover:bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl transition-all transform hover:-translate-y-1">
+                    SAVE TO INVENTORY
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Display -->
+    <div class="lg:col-span-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Active Inventory</h2>
+            <p class="text-slate-500 font-medium text-sm">Managing listings across all districts.</p>
+        </div>
+        <div id="listingContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        <div id="noData" class="text-center py-32 bg-white rounded-[4rem] border-4 border-dashed border-slate-100">
+            <div class="text-6xl mb-4">🚜</div>
+            <h3 class="text-xl font-black text-slate-700">No stock found</h3>
+            <p class="text-slate-400">Add harvest details to start.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+const farmerForm = document.getElementById('farmerForm');
+const listingContainer = document.getElementById('listingContainer');
+const noData = document.getElementById('noData');
+
+// Simulate logged-in farmer
+const currentUser = localStorage.getItem('loggedInName') || 'Farmer1';
+let farmerData = JSON.parse(localStorage.getItem('farmerData')) || {};
+if(!farmerData[currentUser]) farmerData[currentUser] = [];
+
+renderStock();
+updateMarketData();
+
+farmerForm.onsubmit = (e) => {
+    e.preventDefault();
+    const city = document.getElementById('districtName').value;
+    const crop = document.getElementById('cropType').value;
+    const qty = parseFloat(document.getElementById('yieldQty').value);
+    const price = parseFloat(document.getElementById('pricePerKg').value);
+
+    farmerData[currentUser].push({ city, crop, qty, price, date: new Date().toLocaleDateString() });
+    localStorage.setItem('farmerData', JSON.stringify(farmerData));
+
+    renderStock();
+    updateMarketData();
+    farmerForm.reset();
+};
+
+// Render logged-in farmer stock
+function renderStock() {
+    const stock = farmerData[currentUser];
+    listingContainer.innerHTML = '';
+    if(!stock || stock.length === 0) return noData.classList.remove('hidden');
+    noData.classList.add('hidden');
+
+    stock.slice().reverse().forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-[2.5rem] p-6 shadow-md border border-slate-100 hover:border-green-200 transition-all";
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-black uppercase tracking-tighter">📍 ${item.city}</div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Stock</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 mb-1">${item.crop}</h3>
+            <div class="flex items-baseline gap-2 mb-6">
+                <span class="text-3xl font-black text-slate-900">₹${item.price}</span>
+                <span class="text-slate-400 font-bold text-sm">/ KG</span>
+            </div>
+            <div class="bg-slate-50 rounded-2xl p-5 flex justify-between items-center">
+                <div><p class="text-[10px] font-bold text-slate-400 uppercase">Quantity</p><p class="font-black text-slate-700">${item.qty} KG</p></div>
+                <div class="text-right"><p class="text-[10px] font-bold text-slate-400 uppercase">Worth</p><p class="font-black text-green-700">₹${item.qty * item.price}</p></div>
+            </div>
+            <div class="mt-5 flex items-center justify-between pt-4 border-t border-slate-50">
+                <span class="text-[10px] text-slate-300 font-bold uppercase">Date: ${item.date}</span>
+                <button onclick="removeStock(${index});" class="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-black hover:bg-red-500 hover:text-white transition-all uppercase">Remove</button>
+            </div>
+        `;
+        listingContainer.appendChild(card);
+    });
+}
+
+// Remove stock and update market
+function removeStock(index) {
+    farmerData[currentUser].splice(index,1);
+    localStorage.setItem('farmerData', JSON.stringify(farmerData));
+    renderStock();
+    updateMarketData();
+}
+
+// Aggregate all farmers' stock into global market
+function updateMarketData() {
+    const marketData = {};
+    Object.values(farmerData).forEach(farmerStock => {
+        farmerStock.forEach(item => {
+            if(!marketData[item.city]) marketData[item.city] = {};
+            if(!marketData[item.city][item.crop]) marketData[item.city][item.crop] = [];
+            marketData[item.city][item.crop].push(item.price);
+        });
+    });
+
+    // Calculate average prices per crop per city
+    Object.keys(marketData).forEach(city=>{
+        Object.keys(marketData[city]).forEach(crop=>{
+            const prices = marketData[city][crop];
+            marketData[city][crop] = (prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(2);
+        });
+    });
+
+    localStorage.setItem('marketData', JSON.stringify(marketData));
+}
+</script>
+
+</body>
+</html>
