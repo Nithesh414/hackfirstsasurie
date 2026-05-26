@@ -165,7 +165,7 @@ align-items:flex-start;
 
 <h1>Faculty Login</h1>
 
-<input type="email" id="email" placeholder="Enter faculty name">
+<input type="email" id="email" placeholder="Enter Email">
 
 <input type="password" id="password" placeholder="Enter Password">
 
@@ -241,6 +241,7 @@ align-items:flex-start;
 <thead>
 <tr>
 <th>Faculty</th>
+<th>Subject</th>
 <th>Lab</th>
 <th>Day</th>
 <th>Period</th>
@@ -412,7 +413,10 @@ function buildCalendar(){
             if(booking){
 
                 cell.classList.add("allocated");
-                cell.innerHTML = booking.faculty + "<br>Allocated";
+                cell.innerHTML = `
+                    <b>${booking.subject}</b><br>
+                    ${booking.faculty}
+                `;
 
             }else{
 
@@ -436,10 +440,15 @@ function allocateLab(day, period, cell){
 
     const faculty = localStorage.getItem("faculty");
 
+    const subject = prompt("Enter Subject Name");
+
+    if(!subject) return;
+
     let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
     const booking = {
         faculty,
+        subject,
         lab: selectedLab,
         day,
         period,
@@ -451,7 +460,10 @@ function allocateLab(day, period, cell){
     localStorage.setItem("bookings", JSON.stringify(bookings));
 
     cell.classList.add("allocated");
-    cell.innerHTML = faculty + "<br>Allocated";
+    cell.innerHTML = `
+        <b>${subject}</b><br>
+        ${faculty}
+    `;
     cell.onclick = null;
 
     alert("Lab allocated successfully");
@@ -482,6 +494,7 @@ function loadHistory(){
 
         row.innerHTML = `
             <td>${item.faculty}</td>
+            <td>${item.subject}</td>
             <td>${item.lab}</td>
             <td>${item.day}</td>
             <td>${item.period}</td>
