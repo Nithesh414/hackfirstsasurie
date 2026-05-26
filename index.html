@@ -6,13 +6,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lab Management System</title>
 
+
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
 body{
-background: linear-gradient(135deg,#2563eb,#1e3a8a);
+background:linear-gradient(135deg,#2563eb,#1e3a8a);
 min-height:100vh;
 padding:15px;
-font-family:Arial,sans-serif;
+}
+
+.hidden{
+display:none;
 }
 
 /* CONTAINER */
@@ -30,6 +41,11 @@ margin-top:20px;
 overflow:hidden;
 }
 
+.login-box{
+max-width:400px;
+margin-top:100px;
+}
+
 /* TOP BAR */
 
 .top-bar{
@@ -45,6 +61,19 @@ flex-wrap:wrap;
 .top-bar h2{
 font-size:22px;
 color:#1e3a8a;
+}
+
+/* INPUT */
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#f1f5f9;
+font-size:15px;
+outline:none;
 }
 
 /* BUTTON */
@@ -66,7 +95,7 @@ background:#1e40af;
 transform:scale(1.03);
 }
 
-/* LAB CARDS */
+/* LABS */
 
 .labs{
 display:grid;
@@ -84,7 +113,6 @@ color:#1e3a8a;
 cursor:pointer;
 transition:0.3s;
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
-border:2px solid transparent;
 }
 
 .lab-card:hover{
@@ -93,7 +121,7 @@ color:white;
 transform:translateY(-5px);
 }
 
-/* TIMETABLE */
+/* TABLE */
 
 .table-container{
 overflow-x:auto;
@@ -105,7 +133,6 @@ width:100%;
 border-collapse:separate;
 border-spacing:0;
 min-width:700px;
-overflow:hidden;
 }
 
 th{
@@ -113,8 +140,6 @@ background:#2563eb;
 color:white;
 padding:14px;
 font-size:14px;
-position:sticky;
-top:0;
 }
 
 td{
@@ -136,9 +161,10 @@ background:#dbeafe;
 background:#22c55e !important;
 color:white;
 font-weight:bold;
+line-height:1.5;
 }
 
-/* HISTORY BUTTONS */
+/* ACTION BUTTONS */
 
 .action-btn{
 padding:8px 12px;
@@ -155,7 +181,7 @@ background:#f59e0b;
 background:#ef4444;
 }
 
-/* MOBILE HISTORY CARD VIEW */
+/* MOBILE VIEW */
 
 @media(max-width:768px){
 
@@ -186,7 +212,33 @@ grid-template-columns:1fr;
 padding:20px;
 }
 
+/* TIMETABLE */
+
+.table-container{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
+}
+
+table{
+min-width:850px;
+}
+
+th{
+font-size:12px;
+padding:10px;
+}
+
+td{
+font-size:11px;
+padding:10px 6px;
+min-width:120px;
+}
+
 /* HISTORY MOBILE */
+
+#historyPage .table-container{
+overflow-x:hidden;
+}
 
 #historyPage table,
 #historyPage thead,
@@ -196,6 +248,7 @@ padding:20px;
 #historyPage tr{
 display:block;
 width:100%;
+min-width:100%;
 }
 
 #historyPage thead{
@@ -204,23 +257,29 @@ display:none;
 
 #historyPage tr{
 background:white;
-margin-bottom:15px;
+margin-bottom:18px;
 padding:15px;
-border-radius:15px;
+border-radius:18px;
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
 #historyPage td{
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:10px 0;
 border:none;
 font-size:14px;
+background:transparent;
+text-align:right;
+word-break:break-word;
 }
 
 #historyPage td::before{
 font-weight:bold;
 color:#1e3a8a;
+text-align:left;
+margin-right:10px;
 }
 
 /* LABELS */
@@ -257,102 +316,17 @@ content:'Edit';
 content:'Delete';
 }
 
-/* TIMETABLE */
-
-table{
-min-width:650px;
-}
-
-td{
-padding:12px 8px;
-font-size:12px;
-}
-
-button{
-width:100%;
-}
-
-}
-
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-.hidden{
-display:none;
-}
-
-.login-box{
-max-width:400px;
-margin-top:100px;
-}
-
-input{
-width:100%;
-padding:12px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#f1f5f9;
-font-size:15px;
-outline:none;
-}
-
-/* BETTER MOBILE TIMETABLE */
-
-@media(max-width:768px){
-
-.table-container{
-overflow-x:auto;
--webkit-overflow-scrolling:touch;
-}
-
-table{
-min-width:900px;
-}
-
-th{
-font-size:12px;
-padding:10px;
-}
-
-td{
-font-size:11px;
-padding:10px 6px;
-min-width:120px;
-}
-
-/* TIMETABLE TEXT */
-
-.allocated{
-font-size:10px;
-line-height:1.4;
-}
-
-/* BUTTON FIX */
-
-button{
+#historyPage button{
 width:auto;
-font-size:13px;
-padding:10px 14px;
-}
-
-/* HISTORY ACTION BUTTONS */
-
-.action-btn{
-width:90px;
 font-size:12px;
+padding:8px 12px;
 }
 
 }
-
-
-
 
 </style>
+
+
 </head>
 <body>
 
@@ -671,9 +645,6 @@ function allocateLab(day, period, cell){
     alert("Lab allocated successfully");
 }
 
-// =============================
-// HISTORY
-// =============================
 
 function showHistory(){
 
@@ -683,6 +654,47 @@ function showHistory(){
 }
 
 function loadHistory(){
+
+    const body = document.getElementById("historyBody");
+
+    body.innerHTML = "";
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    bookings.slice().reverse().forEach((item, index) => {
+
+        const actualIndex = bookings.length - 1 - index;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.faculty}</td>
+            <td>${item.subject}</td>
+            <td>${item.lab}</td>
+            <td>${item.day}</td>
+            <td>${item.period}</td>
+            <td>${item.date}</td>
+
+            <td>
+                <button class="action-btn edit-btn"
+                    onclick="editBooking(${actualIndex})">
+                    Edit
+                </button>
+            </td>
+
+            <td>
+                <button class="action-btn delete-btn"
+                    onclick="deleteBooking(${actualIndex})">
+                    Delete
+                </button>
+            </td>
+        `;
+
+        body.appendChild(row);
+    });
+}
+
+
 
     const body = document.getElementById("historyBody");
 
@@ -705,7 +717,6 @@ function loadHistory(){
 
         body.appendChild(row);
     });
-}
 
 
 // =============================
