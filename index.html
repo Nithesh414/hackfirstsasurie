@@ -246,9 +246,15 @@ align-items:flex-start;
 <th>Day</th>
 <th>Period</th>
 <th>Date</th>
+<th>Edit</th>
+<th>Delete</th>
+
 </tr>
 </thead>
 <tbody id="historyBody"></tbody>
+
+
+
 </table>
 </div>
 
@@ -530,6 +536,111 @@ window.onload = function(){
         loadDepartments();
     }
 };
+
+function showHistory(){
+
+    showPage("historyPage");
+
+    loadHistory();
+}
+
+function loadHistory(){
+
+    const body = document.getElementById("historyBody");
+
+    body.innerHTML = "";
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    bookings.slice().reverse().forEach((item, index) => {
+
+        const actualIndex = bookings.length - 1 - index;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.faculty}</td>
+            <td>${item.subject}</td>
+            <td>${item.lab}</td>
+            <td>${item.day}</td>
+            <td>${item.period}</td>
+            <td>${item.date}</td>
+
+            <td>
+                <button onclick="editBooking(${actualIndex})">
+                    Edit
+                </button>
+            </td>
+
+            <td>
+                <button onclick="deleteBooking(${actualIndex})">
+                    Delete
+                </button>
+            </td>
+        `;
+
+        body.appendChild(row);
+    });
+}
+
+// =============================
+// EDIT BOOKING
+// =============================
+
+function editBooking(index){
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    const booking = bookings[index];
+
+    const newSubject = prompt(
+        "Edit Subject Name",
+        booking.subject
+    );
+
+    if(!newSubject) return;
+
+    bookings[index].subject = newSubject;
+
+    localStorage.setItem(
+        "bookings",
+        JSON.stringify(bookings)
+    );
+
+    loadHistory();
+
+    alert("Booking updated successfully");
+}
+
+// =============================
+// DELETE BOOKING
+// =============================
+
+function deleteBooking(index){
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this booking?"
+    );
+
+    if(!confirmDelete) return;
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    bookings.splice(index, 1);
+
+    localStorage.setItem(
+        "bookings",
+        JSON.stringify(bookings)
+    );
+
+    loadHistory();
+
+    alert("Booking deleted successfully");
+}
+
+
+
+
 
 </script>
 
