@@ -1,0 +1,524 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Management System</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#2563eb,#1e3a8a);
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+width:95%;
+max-width:1100px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+margin-top:30px;
+}
+
+.hidden{
+display:none;
+}
+
+.login-box{
+max-width:400px;
+margin-top:100px;
+}
+
+h1,h2{
+color:#1e3a8a;
+margin-bottom:20px;
+}
+
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border:1px solid #cbd5e1;
+border-radius:8px;
+font-size:15px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:8px;
+cursor:pointer;
+font-size:15px;
+transition:0.3s;
+}
+
+button:hover{
+background:#1e40af;
+transform:scale(1.03);
+}
+
+.labs{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+justify-content:center;
+}
+
+.lab-card{
+background:#f1f5f9;
+padding:20px;
+border-radius:12px;
+min-width:180px;
+text-align:center;
+font-weight:bold;
+color:#1e3a8a;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.lab-card:hover{
+background:#2563eb;
+color:white;
+transform:translateY(-5px);
+}
+
+.table-container{
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#2563eb;
+color:white;
+padding:12px;
+}
+
+td{
+padding:12px;
+border:1px solid #e2e8f0;
+text-align:center;
+background:#f8fafc;
+cursor:pointer;
+transition:0.3s;
+}
+
+td:hover{
+background:#dbeafe;
+}
+
+.allocated{
+background:#22c55e !important;
+color:white;
+font-weight:bold;
+}
+
+@media(max-width:768px){
+
+.lab-card{
+width:100%;
+}
+
+th,td{
+font-size:12px;
+padding:8px;
+}
+
+.top-bar{
+flex-direction:column;
+align-items:flex-start;
+}
+
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="container login-box" id="loginPage">
+
+<h1>Faculty Login</h1>
+
+<input type="email" id="email" placeholder="Enter Email">
+
+<input type="password" id="password" placeholder="Enter Password">
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<!-- DASHBOARD -->
+<div class="container hidden" id="dashboardPage">
+
+<div class="top-bar">
+<h1>Select Department</h1>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="departments" class="labs"></div>
+
+<br>
+
+<button onclick="showHistory()">View Booking History</button>
+
+</div>
+
+<!-- LABS -->
+<div class="container hidden" id="labsPage">
+
+<div class="top-bar">
+<h1 id="deptTitle">Select Lab</h1>
+<button onclick="backToDashboard()">Back</button>
+</div>
+
+<div id="labs" class="labs"></div>
+
+</div>
+
+<!-- TIMETABLE -->
+<div class="container hidden" id="timetablePage">
+
+<div class="top-bar">
+<h2 id="labTitle">Lab Timetable</h2>
+<button onclick="backToLabs()">Back</button>
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Period</th>
+<th>Mon</th>
+<th>Tue</th>
+<th>Wed</th>
+<th>Thu</th>
+<th>Fri</th>
+<th>Sat</th>
+</tr>
+</thead>
+<tbody id="calendarBody"></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- HISTORY -->
+<div class="container hidden" id="historyPage">
+
+<div class="top-bar">
+<h2>Booking History</h2>
+<button onclick="backToDashboard()">Back</button>
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Faculty</th>
+<th>Lab</th>
+<th>Day</th>
+<th>Period</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+// =============================
+// DUMMY DATA
+// =============================
+
+const departments = {
+    "CSE": ["CSE Lab 1", "CSE Lab 2", "AI Lab"],
+    "ECE": ["Embedded Lab", "VLSI Lab"],
+    "EEE": ["Electrical Lab", "Machines Lab"],
+    "MECH": ["CAD Lab", "Thermal Lab"]
+};
+
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const periods = [1,2,3,4,5,6,7];
+
+let selectedDepartment = "";
+let selectedLab = "";
+
+// =============================
+// LOGIN
+// =============================
+
+function login(){
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if(email && password){
+
+        localStorage.setItem("faculty", email);
+
+        showPage("dashboardPage");
+
+        loadDepartments();
+
+    }else{
+        alert("Please enter email and password");
+    }
+}
+
+function logout(){
+    localStorage.clear();
+    location.reload();
+}
+
+// =============================
+// PAGE CONTROL
+// =============================
+
+function hideAllPages(){
+
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("dashboardPage").classList.add("hidden");
+    document.getElementById("labsPage").classList.add("hidden");
+    document.getElementById("timetablePage").classList.add("hidden");
+    document.getElementById("historyPage").classList.add("hidden");
+}
+
+function showPage(pageId){
+
+    hideAllPages();
+
+    document.getElementById(pageId).classList.remove("hidden");
+}
+
+// =============================
+// LOAD DEPARTMENTS
+// =============================
+
+function loadDepartments(){
+
+    const container = document.getElementById("departments");
+
+    container.innerHTML = "";
+
+    Object.keys(departments).forEach(dept => {
+
+        const card = document.createElement("div");
+
+        card.className = "lab-card";
+
+        card.innerHTML = dept;
+
+        card.onclick = () => {
+            selectedDepartment = dept;
+            showLabs();
+        };
+
+        container.appendChild(card);
+    });
+}
+
+// =============================
+// SHOW LABS
+// =============================
+
+function showLabs(){
+
+    showPage("labsPage");
+
+    document.getElementById("deptTitle").innerText = selectedDepartment + " Labs";
+
+    const labsContainer = document.getElementById("labs");
+
+    labsContainer.innerHTML = "";
+
+    departments[selectedDepartment].forEach(lab => {
+
+        const card = document.createElement("div");
+
+        card.className = "lab-card";
+
+        card.innerHTML = lab;
+
+        card.onclick = () => {
+            selectedLab = lab;
+            buildCalendar();
+        };
+
+        labsContainer.appendChild(card);
+    });
+}
+
+// =============================
+// BUILD TIMETABLE
+// =============================
+
+function buildCalendar(){
+
+    showPage("timetablePage");
+
+    document.getElementById("labTitle").innerText = selectedLab;
+
+    const tableBody = document.getElementById("calendarBody");
+
+    tableBody.innerHTML = "";
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    periods.forEach(period => {
+
+        const row = document.createElement("tr");
+
+        const periodCell = document.createElement("td");
+        periodCell.innerText = "P" + period;
+
+        row.appendChild(periodCell);
+
+        days.forEach(day => {
+
+            const cell = document.createElement("td");
+
+            const booking = bookings.find(
+                b => b.lab === selectedLab && b.day === day && b.period === period
+            );
+
+            if(booking){
+
+                cell.classList.add("allocated");
+                cell.innerHTML = booking.faculty + "<br>Allocated";
+
+            }else{
+
+                cell.innerHTML = "Available";
+
+                cell.onclick = () => allocateLab(day, period, cell);
+            }
+
+            row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+    });
+}
+
+// =============================
+// ALLOCATE LAB
+// =============================
+
+function allocateLab(day, period, cell){
+
+    const faculty = localStorage.getItem("faculty");
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    const booking = {
+        faculty,
+        lab: selectedLab,
+        day,
+        period,
+        date: new Date().toLocaleDateString()
+    };
+
+    bookings.push(booking);
+
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+
+    cell.classList.add("allocated");
+    cell.innerHTML = faculty + "<br>Allocated";
+    cell.onclick = null;
+
+    alert("Lab allocated successfully");
+}
+
+// =============================
+// HISTORY
+// =============================
+
+function showHistory(){
+
+    showPage("historyPage");
+
+    loadHistory();
+}
+
+function loadHistory(){
+
+    const body = document.getElementById("historyBody");
+
+    body.innerHTML = "";
+
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    bookings.slice().reverse().forEach(item => {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.faculty}</td>
+            <td>${item.lab}</td>
+            <td>${item.day}</td>
+            <td>${item.period}</td>
+            <td>${item.date}</td>
+        `;
+
+        body.appendChild(row);
+    });
+}
+
+// =============================
+// NAVIGATION
+// =============================
+
+function backToDashboard(){
+    showPage("dashboardPage");
+}
+
+function backToLabs(){
+    showPage("labsPage");
+}
+
+// =============================
+// AUTO LOGIN
+// =============================
+
+window.onload = function(){
+
+    const faculty = localStorage.getItem("faculty");
+
+    if(faculty){
+        showPage("dashboardPage");
+        loadDepartments();
+    }
+};
+
+</script>
+
+</body>
+</html>
